@@ -8,22 +8,17 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
-import Market from './components/market';
+import Market from '../../shared/components/market';
 import stylesForms from './../../styles/forms';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { routes } from '../../shared/routes';
+import { getMarket } from '../../core/services/markets/marketService';
 
 const Markets = (props) => {
   const [markets, setMarkets] = useState([]);
   const [code, setCode] = useState('');
   const [tiEnabled, setTiEnabled] = useState(true);
   const [email, setEmail] = useState('');
-
-  // useFocusEffect(() => {
-  //   props.navigation.setOptions({
-  //     title: 'Ingresar a un market',
-  //   });
-  // });
 
   useEffect(() => {
     getMarkets();
@@ -42,14 +37,13 @@ const Markets = (props) => {
 
   const getMarkets = async () => {
     try {
-      const res = await axios.get(`${routes.markets}${email}`);
+      const res = await getMarket(email);
       const json = await res.data;
       const arrayMarkets = [];
       json.map((market) => {
         arrayMarkets.push(market);
       });
       setMarkets(arrayMarkets);
-      console.log(markets[0]);
     } catch (e) {
       console.log(e);
     }
@@ -57,18 +51,12 @@ const Markets = (props) => {
 
   const searchMarket = async () => {
     try {
-      const res = await axios.get(
-        `${routes.employees}store/${code}?user=${email}`
-      );
-      console.log(res.data);
+      const res = await searchMarket(code, email);
 
       if (res.status > 399) {
-        Alert.alert('Error', 'Hubo un error con tu codigo):', [
-          {
-            title: 'Aceptar',
-            onPress: () => console.log('metio un codigo erroreno):'),
-          },
-        ]);
+
+        errorAlert('Hubo un error con tu codigo', () => {});
+
       } else {
         Alert.alert(
           'Ok',

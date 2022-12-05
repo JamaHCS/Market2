@@ -13,7 +13,8 @@ import { AntDesign } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { routes } from '../../shared/routes';
-
+import { errorAlert, loginAlert } from '../../shared/utils/alerts';
+import { postLogin } from '../../core/services/auth/authService';
 
 const Login = (props) => {
   const [username, setUsername] = useState('');
@@ -24,146 +25,62 @@ const Login = (props) => {
 
   const validaLogin = async () => {
     if (username.length < 10) {
-      Alert.alert('ERROR', 'Correo incorrecto', [
-        {
-          text: 'Cerrar',
-          onPress: () => setUsername(''),
-        },
-      ]);
+      errorAlert('Correo incorrecto', setUsername);
 
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert('ERROR', 'Contraseña incorrecta', [
-        {
-          text: 'Cerrar',
-          onPress: () => setPassword(''),
-        },
-      ]);
+      errorAlert('Contraseña incorrecta', setPassword);
 
       return;
     }
+
     try {
-      const res = await axios.post(routes.login, {
-        email: username,
-        password: password,
-      });
+      const res = await postLogin(username, password);
 
       const json = await res.data;
-      //console.log(res.status);
-      console.log('json', json);
-      // console.log(username);
 
       if (res.status === 200) {
-        try {
-          console.log(
-            '--------------------------------------------------------------------------------------------------------------------------------------------------------'
-          );
-          console.log(
-            '--------------------------------------------------------------------------------------------------------------------------------------------------------'
-          );
-          console.log(
-            '--------------------------------------------------------------------------------------------------------------------------------------------------------'
-          );
-          console.log(
-            '--------------------------------------------------------------------------------------------------------------------------------------------------------'
-          );
-          console.log(
-            '--------------------------------------------------------------------------------------------------------------------------------------------------------'
-          );
-          AsyncStorage.setItem('@access_token', json.access_token);
-          console.log('@access_token: ', json.access_token);
+        AsyncStorage.setItem('@access_token', json.access_token);
+        AsyncStorage.setItem('@user.email', json.user.email);
+        AsyncStorage.setItem('@user.name', json.user.name);
 
-          AsyncStorage.setItem('@user.email', json.user.email);
-          console.log('@user.email: ', json.user.email);
+        if (json.user.markets.length != 0) {
+          AsyncStorage.setItem('@user.has_markets', '1');
+          AsyncStorage.setItem('@user.uuid', json.user.markets[0].uuid);
+          AsyncStorage.setItem('@market.id', json.user.markets[0].id + '');
 
-          AsyncStorage.setItem('@user.name', json.user.name);
-          console.log('@user.name: ', json.user.name);
+          let aNumber = '' + json.user.markets[0].relation_id;
 
-          if (json.user.markets.length != 0) {
-            AsyncStorage.setItem('@user.has_markets', '1');
-            console.log('@user.has_markets: 1');
+          AsyncStorage.setItem('@user.name_market', json.user.markets[0].name);
+          AsyncStorage.setItem('@user.markets', aNumber);
 
-            AsyncStorage.setItem('@user.uuid', json.user.markets[0].uuid);
-            console.log('@user.uuid: ', json.user.markets[0].uuid);
-
-            AsyncStorage.setItem('@market.id', json.user.markets[0].id + '');
-            console.log('@market.id: ', json.user.markets[0].id + '');
-
-            let aNumber = '' + json.user.markets[0].relation_id;
+          if (json.user.markets[0].location.active) {
+            AsyncStorage.setItem('@location.active', '1');
 
             AsyncStorage.setItem(
-              '@user.name_market',
-              json.user.markets[0].name
+              '@user.latitude',
+              '' + json.user.markets[0].location.latitude
             );
-            console.log('@user.name_market: ', json.user.markets[0].name);
 
-            AsyncStorage.setItem('@user.markets', aNumber);
-            console.log('relation_id: ', aNumber, typeof aNumber);
-
-            if (json.user.markets[0].location.active) {
-              AsyncStorage.setItem('@location.active', '1');
-
-              AsyncStorage.setItem(
-                '@user.latitude',
-                '' + json.user.markets[0].location.latitude
-              );
-              console.log(
-                '@user.latitude: ',
-                '' + json.user.markets[0].location.latitude
-              );
-
-              AsyncStorage.setItem(
-                '@user.longitude',
-                '' + json.user.markets[0].location.longitude
-              );
-              console.log(
-                '@user.longitude: ',
-                '' + json.user.markets[0].location.longitude
-              );
-            } else {
-              AsyncStorage.setItem('@location.active', '0');
-            }
+            AsyncStorage.setItem(
+              '@user.longitude',
+              '' + json.user.markets[0].location.longitude
+            );
           } else {
-            AsyncStorage.setItem('@user.has_markets', '0');
-            console.log('@user.has_markets: 0');
+            AsyncStorage.setItem('@location.active', '0');
           }
-
-          AsyncStorage.setItem(
-            '@user.profile_photo_url',
-            json.user.profile_photo_url
-          );
-          console.log('@user.profile_photo_url: ', json.user.profile_photo_url);
-        } catch (e) {
-          console.log('Error guardando el login: ', e);
+        } else {
+          AsyncStorage.setItem('@user.has_markets', '0');
         }
 
-        Alert.alert(
-          'Hey!',
-          `Bienvenido ${username}`,
-          [
-            {
-              title: 'Aceptar',
-              onPress: () => {
-                setBtnVisible(false);
-                setAiVisible(true);
-                setTiEnabled(false);
-                setTimeout(() => {
-                  setBtnVisible(true);
-                  setAiVisible(false);
-                  setTiEnabled(true);
-                  //Direccionar a Home
-
-                  props.navigation.navigate('Home');
-                }, 350);
-              },
-            },
-          ],
-          {
-            cancelable: false,
-          }
+        AsyncStorage.setItem(
+          '@user.profile_photo_url',
+          json.user.profile_photo_url
         );
+
+          loginAlert(username, props);
       }
     } catch (e) {
       console.log(e);

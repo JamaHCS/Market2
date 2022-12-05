@@ -28,7 +28,6 @@ const MenuInicial = (props) => {
 
       const result3 = await AsyncStorage.getItem('@location.active');
       setLocation(result3);
-      // console.log(token);
     } catch (e) {
       console.log(e);
     }

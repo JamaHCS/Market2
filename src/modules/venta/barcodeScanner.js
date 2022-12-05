@@ -5,6 +5,8 @@ import styles from '../../styles/forms';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { routes } from '../../shared/routes';
+import { errorAlert } from '../../shared/utils/alerts';
+import { getBarcodeProduct, postSell } from '../../core/services/barcode/barcodeService';
 
 const Scanner = (props) => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -31,15 +33,9 @@ const Scanner = (props) => {
 
   const getSell = async () => {
     try {
-      const result = await AsyncStorage.getItem('@access_token');
-      setToken(result);
-
       const relation_id = await AsyncStorage.getItem('@user.markets');
       setMarket(relation_id);
-      //const result2 = await AsyncStorage.getItem('@user.markets');
-      //const jsonValue = await JSON.parse(result2);
-      //const json = await jsonValue.relation_id;
-      //setRelation(json);
+
     } catch (e) {
       console.log(e);
     }
@@ -54,17 +50,10 @@ const Scanner = (props) => {
 
     setScanned(true);
 
-    const res = await axios.get(
-      `${routes.products}?barcode=${data}`,
-      {
-        headers: {
-          Authorization: 'Bearer ' + token,
-        },
-      }
-    );
+    const res = await getBarcodeProduct(data);
+    
     const json = await res.data;
-    console.log(json);
-    //alert(`Bar code with type ${type} and data ${data} has been scanned!`)
+
     if (json.stock > 0) {
       if (countTotal == 0) {
         Alert.alert(
@@ -91,17 +80,6 @@ const Scanner = (props) => {
                   });
 
                   setProducts(array);
-                  console.log(
-                    '-----------------------------------------------------'
-                  );
-                  console.log(array);
-                  console.log('relation_id: ', market);
-
-                  console.log('Res:  ---------------------------');
-                  console.log(res.data);
-
-                  console.log('Array: ------------------------------');
-                  console.log(array);
                   setScanned(false);
 
                   // setProducts(array);
@@ -126,17 +104,9 @@ const Scanner = (props) => {
                   });
 
                   setProducts(array);
-                  console.log(json);
-                  console.log(array);
-                  console.log('relation_id: ', market);
 
-                  const res = await axios.post(
-                    routes.sell,
-                    {
-                      sells: array,
-                      relation_id: market,
-                    }
-                  );
+                  const res = await postSell(array, market);
+
                   if (res.status == 200) {
                     Alert.alert(
                       'Venta confirmada',
@@ -151,8 +121,7 @@ const Scanner = (props) => {
                       ]
                     );
                   }
-                  console.log(res.data);
-                  console.log(arraySells);
+
                   setScanned(false);
                 } catch (e) {
                   console.log(e);
@@ -173,7 +142,7 @@ const Scanner = (props) => {
           '¡Hey!',
           `
         
-        Bar code: ${data}
+          Bar code: ${data}
           Producto: ${json.name}
           Precio: ${json.price}`,
           [
@@ -193,20 +162,8 @@ const Scanner = (props) => {
                   });
 
                   setProducts(array);
-                  console.log(
-                    '-----------------------------------------------------'
-                  );
-                  console.log(array);
-                  console.log('relation_id: ', market);
-
-                  console.log('Res:  ---------------------------');
-                  console.log(res.data);
-
-                  console.log('Array: ------------------------------');
-                  console.log(array);
                   setScanned(false);
 
-                  // setProducts(array);
                 } catch (e) {
                   console.log(e);
                   setScanned(false);
@@ -228,17 +185,9 @@ const Scanner = (props) => {
                   });
 
                   setProducts(array);
-                  console.log(json);
-                  console.log(array);
-                  console.log('relation_id: ', market);
 
-                  const res = await axios.post(
-                    routes.sell,
-                    {
-                      sells: array,
-                      relation_id: market,
-                    }
-                  );
+                  const res = await postSell(array, market);
+                  
                   if (res.status == 200) {
                     Alert.alert(
                       'Venta confirmada',
@@ -253,8 +202,7 @@ const Scanner = (props) => {
                       ]
                     );
                   }
-                  console.log(res.data);
-                  console.log(arraySells);
+
                   setScanned(false);
                 } catch (e) {
                   console.log(e);
@@ -271,23 +219,11 @@ const Scanner = (props) => {
     }
 
     if (json.stock <= 0) {
-      Alert.alert(
-        'ERROR',
-        'No hay suficiente stock...',
-        [
-          {
-            title: 'Aceptar',
-            onPress: null,
-          },
-        ],
-        {
-          cancelable: false,
-        }
-      );
+      errorAlert('No hay suficiente stock...', () => {});
+
       setScanned(false);
     }
 
-    console.log(data);
   };
 
   if (hasPermission === null) {

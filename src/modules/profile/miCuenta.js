@@ -50,13 +50,6 @@ const MiCuenta = (props) => {
     }
   };
 
-  //Titulo del screen en foco
-  // useFocusEffect(() => {
-  //   props.navigation.setOptions({
-  //     title: 'Mi cuenta',
-  //   });
-  // });
-
   datosUser();
 
   const tomarImagenGaleria = async () => {

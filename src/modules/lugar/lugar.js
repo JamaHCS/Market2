@@ -34,6 +34,9 @@ const Lugar = (props) => {
   const [lonUser, setLonUser] = useState('');
   const [longitude, setLongitude] = useState('');
 
+  const [mostrarUbic, setMostrarUbic] = useState(false);
+  const [mapa, setMapa] = useState(null);
+
   const getStorage = async () => {
     try {
       const result = await AsyncStorage.getItem('@user.name_market');
@@ -51,14 +54,6 @@ const Lugar = (props) => {
 
   getStorage();
 
-  const [mostrarUbic, setMostrarUbic] = useState(false);
-  const [mapa, setMapa] = useState(null);
-
-  // useFocusEffect(() => {
-  //   props.navigation.setOptions({
-  //     title: name,
-  //   });
-  // });
 
   const getUbicacion = async () => {
     try {

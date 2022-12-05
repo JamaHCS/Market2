@@ -11,6 +11,9 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { routes } from '../../shared/routes';
+import { errorAlert } from '../../shared/utils/alerts';
+import { postRegister } from '../../core/services/auth/authService';
+
 
 const Registro = (props) => {
   const [nombre, setNombre] = useState('');
@@ -25,67 +28,28 @@ const Registro = (props) => {
 
   const validaRegistro = async () => {
     if (nombre.length < 3) {
-      Alert.alert(
-        'ERROR!',
-        'Nombre incompleto',
-        [
-          {
-            title: 'Corregir',
-            onPress: () => {
-              setNombre('');
-            },
-          },
-        ],
-        {
-          cancelable: false,
-        }
-      );
+      errorAlert('Nombre incompleto', setNombre);
+
       return;
     }
 
     if (email.length < 10) {
-      Alert.alert(
-        'ERROR!',
-        'Email incompleto',
-        [
-          {
-            title: 'Corregir',
-            onPress: () => {
-              setEmail('');
-            },
-          },
-        ],
-        {
-          cancelable: false,
-        }
-      );
+      errorAlert('Email incompleto', setEmail);
+
       return;
     }
 
     if (contrasena.length < 8 || contrasena.length > 25) {
-      Alert.alert(
-        'ERROR!',
+      errorAlert(
         'Contraseña incompleta (deben ser 8 dígitos mínimo)',
-        [
-          {
-            title: 'Corregir',
-            onPress: () => {
-              setContrasena('');
-            },
-          },
-        ],
-        {
-          cancelable: false,
-        }
+        setContrasena
       );
+
       return;
     }
 
-    const res = await axios.post(routes.register, {
-      name: nombre,
-      email: email,
-      password: contrasena,
-    });
+    const res = await postRegister(nombre, email, contrasena);
+
     if (res.status === 201) {
       Alert.alert(
         'Hey!',
@@ -110,8 +74,6 @@ const Registro = (props) => {
         }
       );
     }
-    console.log(res.data);
-    console.log(res.status);
   };
 
   return (

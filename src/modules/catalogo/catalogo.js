@@ -7,6 +7,7 @@ import Producto from './../../shared/components/producto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import stylesForms from './../../styles/forms';
 import { routes } from '../../shared/routes';
+import { getProduct } from '../../core/services/catalogo/catalogoService';
 
 const Catologo = (props) => {
   const [producto, setProducto] = useState([]);
@@ -18,34 +19,25 @@ const Catologo = (props) => {
 
   const getProductos = async () => {
     try {
-      console.log('------------------ catalogo -----------------');
       const result = await AsyncStorage.getItem('@user.name_market');
       const marketId = await AsyncStorage.getItem('@market.id');
-      console.log('market??', marketId);
       
       setName(result);
-      console.log('market: ', name);
 
-      const response = await axios.get(
-        `${routes.products}?market=${marketId}`
-      );
+      const response = await getProduct(marketId);
+
       const json = await response.data;
       const arrayProductos = [];
+
       json.map((product) => {
         arrayProductos.push(product);
       });
-      console.log(producto);
+      
       setProducto(arrayProductos);
     } catch (e) {
       console.log(e);
     }
   };
-
-  // useFocusEffect(() => {
-  //   props.navigation.setOptions({
-  //     title: 'Catálogo de ' + name,
-  //   });
-  // });
 
   return (
     <View style={stylesForms.contenedor}>
