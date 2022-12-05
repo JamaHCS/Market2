@@ -13,8 +13,6 @@ import { AntDesign } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { routes } from '../../shared/routes';
-import { errorAlert, loginAlert } from '../../shared/utils/alerts';
-import { postLogin } from '../../core/services/auth/authService';
 
 const Login = (props) => {
   const [username, setUsername] = useState('');
@@ -25,19 +23,32 @@ const Login = (props) => {
 
   const validaLogin = async () => {
     if (username.length < 10) {
-      errorAlert('Correo incorrecto', setUsername);
+      Alert.alert('ERROR', 'Correo incorrecto', [
+        {
+          text: 'Cerrar',
+          onPress: () => setUsername(''),
+        },
+      ]);
 
       return;
     }
 
     if (password.length < 8) {
-      errorAlert('Contraseña incorrecta', setPassword);
+      Alert.alert('ERROR', 'Contraseña incorrecta', [
+        {
+          text: 'Cerrar',
+          onPress: () => setPassword(''),
+        },
+      ]);
 
       return;
     }
 
     try {
-      const res = await postLogin(username, password);
+      const res = await axios.post(routes.login, {
+        email: username,
+        password: password,
+      });
 
       const json = await res.data;
 
@@ -80,7 +91,31 @@ const Login = (props) => {
           json.user.profile_photo_url
         );
 
-          loginAlert(username, props);
+        Alert.alert(
+          'Hey!',
+          `Bienvenido ${username}`,
+          [
+            {
+              title: 'Aceptar',
+              onPress: () => {
+                setBtnVisible(false);
+                setAiVisible(true);
+                setTiEnabled(false);
+                setTimeout(() => {
+                  setBtnVisible(true);
+                  setAiVisible(false);
+                  setTiEnabled(true);
+                  //Direccionar a Home
+
+                  props.navigation.navigate('Home');
+                }, 350);
+              },
+            },
+          ],
+          {
+            cancelable: false,
+          }
+        );
       }
     } catch (e) {
       console.log(e);

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { routes } from '../../../shared/routes';
+import axios from 'axios';
 
 export const getBarcodeProduct = async (data) => {
   const token = await AsyncStorage.getItem('@access_token');

@@ -1,4 +1,5 @@
 import { routes } from "../../../shared/routes";
+import axios from 'axios';
 
 export const getMarket = (email) => {
   return axios.get(`${routes.markets}${email}`);
