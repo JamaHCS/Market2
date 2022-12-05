@@ -7,7 +7,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { routes } from '../../shared/routes';
 import { errorAlert } from '../../shared/utils/alerts';
 import { getBarcodeProduct, postSell } from '../../core/services/barcode/barcodeService';
-
+/**
+ * Componente que se encarga de la lógica de escaneo de productos mediante codigo de barras
+ * 
+ * @param  {props} props
+ */
 const Scanner = (props) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);

@@ -1,6 +1,13 @@
 import React from 'react';
 import { ImageBackground, Text, TouchableOpacity, View } from 'react-native';
-
+/**
+ * 
+ * Componente que recibe como prop un objeto
+ * que contendrá toda la información del market a evaluar. 
+ * Y que posteriormente, mostrará en forma de grid para ir apilando todos los Markets que existan
+ * 
+ * @param  {object} {datosMarket}
+ */
 const Market = ({ datosMarket }) => {
   const {
     id,

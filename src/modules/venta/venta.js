@@ -4,7 +4,12 @@ import { Text, View } from 'react-native';
 import stylesForms from './../../styles/forms';
 
 import Scanner from './barcodeScanner';
-
+/**
+ * Componente padre, usado como contenedor para mostrar 
+ * el scanner de codigo de barras y comenzar con la venta.
+ * 
+ * @param  {props} props
+ */
 const NuevaVenta = (props) => {
   const [scanner, setScanner] = useState(true);
 

@@ -1,7 +1,12 @@
 import React from 'react';
 import { ImageBackground, Text, TouchableOpacity, View } from 'react-native';
-import stylesForms from './../../styles/forms';
-
+/**
+ * 
+ * Componente que prepara los productos para ser mostrados en forma
+ * de grid dentro de la pantalla de productos
+ * 
+ * @param  {object} {datosProducto}
+ */
 const Producto = ({ datosProducto }) => {
   const { id, name, brand, barcode, type, price, cost, image } = datosProducto;
   return (
